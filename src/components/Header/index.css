@@ -1,0 +1,60 @@
+.header{
+    height: 80px;
+    background-color: white;
+    color: #888;
+}
+
+.header .header-top{
+    height: 40px;
+    border-bottom: 1px solid green;
+    text-align: right;
+    line-height: 40px;
+    padding-right: 20px;
+}
+
+.header .header-top span{
+    margin-right: 10px;
+}
+
+.header .header-top a{
+    color: green;
+}
+
+.header .header-bottom{
+    height: 40px;
+    display: flex;
+}
+
+.header .header-bottom .header-bottom-title{
+    width: 25%;
+    line-height: 40px;
+    font-size: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.header .header-bottom .header-bottom-title .pointer{
+    border-top: 20px solid white;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid transparent;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 90%;
+}
+
+.header .header-bottom .header-bottom-info{
+    width: 75%;
+    padding-right: 20px;
+    text-align: right;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.header .header-bottom .header-bottom-info .temperature{
+    margin: 0 15px;
+}
+
+
