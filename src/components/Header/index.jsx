@@ -88,9 +88,8 @@ class Header extends Component {
         // event.defaultPrevented(event)
         const { confirm } = Modal;
         confirm({
-            title: 'Do you Want to delete these items?',
+            title: '您确定要退出登陆吗 ?',
             icon: <ExclamationCircleFilled />,
-            content: 'Some descriptions',
             onOk : () => {
                 // console.log('OK');
                 storageUtils.removeUser()

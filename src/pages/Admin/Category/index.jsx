@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
-import {Button, Card, Table, message} from "antd";
-import {PlusOutlined, ArrowRightOutlined} from '@ant-design/icons';
+import {Button, Card, Table, message, Modal, Input} from "antd";
+import {PlusOutlined, ArrowRightOutlined, ExclamationCircleFilled} from '@ant-design/icons';
 import LinkButton from "../../../components/LinkButton";
-import {reqCategories} from "../../../api";
+import {reqCategories, reqAddCategory, reqUpdateCategory} from "../../../api";
+
+import AddForm from './add-form'
+import UpdateForm from './update-form'
 
 class Category extends Component {
 
@@ -11,7 +14,9 @@ class Category extends Component {
         categories: [],
         subCategories: [],
         parentId: '0',
-        parentName: ''
+        parentName: '',
+        showModalStatus: 0,   // 0表示都不展示,1表示添加分类,2表示修改分类
+        cancelStatus: 0    // 0 表示未点击, 1表示点击了cancel
     }
 
     // 初始化Table所有列数
@@ -26,15 +31,14 @@ class Category extends Component {
                 title: '操作',
                 width: 300,
                 render: (categoryObj) =>
-
                     // this.showLinkButton(categoryObj)
-
                     <div>
-                        <LinkButton>修改分类</LinkButton>
+                        <LinkButton onClick={() => {
+                            this.showUpdateModal(categoryObj)
+                        }}>修改分类</LinkButton>
                         {categoryObj.parentId === '0' ? <LinkButton
                             onClick={() => this.showSubCategories(categoryObj)}>查看子分类</LinkButton> : null}
                     </div>
-
             }
         ]
     }
@@ -99,6 +103,61 @@ class Category extends Component {
         })
     }
 
+    showAddModal = () => {
+        this.setState({showModalStatus: 1})
+    }
+
+    showUpdateModal = (categoryObj) => {
+        this.categoryObj = categoryObj
+
+        this.setState({showModalStatus: 2})
+    }
+
+
+    hideModal = () => {
+        this.setState({showModalStatus: 0})
+    }
+
+
+    addCategory = () => {
+         /*const {value: categoryName} = this.categoryInput.input
+         console.log(categoryName)
+         reqAddCategory('0', categoryName)
+
+         this.setState({categories: []}, () => {
+             // 重新请求一级列表
+             this.getCategories()
+         })
+
+         this.hideModal()
+         message.success('添加成功')*/
+    }
+
+
+    updateCategory = async () => {
+        // 关闭对话框
+        this.hideModal()
+        // 发送更新数据请求
+        const categoryId = this.categoryObj._id
+        const categoryName = this.newCategoryName
+        const result = await reqUpdateCategory({categoryId, categoryName})
+        if (result.status === 0){  // 更新成功
+            // 重新请求数据
+            this.getCategories()
+        }
+    }
+
+
+    /*handleOnKeyDown = () => {
+        console.log('handleOnKeyDown')
+    }*/
+
+    // 勾子函数传递给子组件
+    getUpdatedCategoryValue = (value) => {
+        this.newCategoryName = value
+    }
+
+
     // 为第一次render()准备数据
     componentWillMount() {
         this.initColumns()
@@ -152,7 +211,24 @@ class Category extends Component {
          ];*/
 
 
-        const {categories, loading, parentId, subCategories, parentName} = this.state
+        // 若还未点击‘修改分类’,则初始化name为'', 否则正常读取
+        if (!this.categoryObj) {
+            this.name = ''
+        } else {
+            this.name = this.categoryObj.name
+        }
+        // const category = this.categoryObj || {}
+
+
+        const {
+            categories,
+            loading,
+            parentId,
+            subCategories,
+            parentName,
+            showModalStatus,
+        } = this.state
+
 
         // console.log('render........: ', subCategories)
 
@@ -161,7 +237,7 @@ class Category extends Component {
 
 
         const extra =
-            <Button type='primary'>
+            <Button type='primary' onClick={this.showAddModal}>
                 <PlusOutlined/> 添加
             </Button>
 
@@ -175,6 +251,34 @@ class Category extends Component {
                     columns={this.columns}
                     loading={loading}
                 />
+
+                <Modal
+                    title="添加分类"
+                    open={showModalStatus === 1}
+                    onOk={this.addCategory}
+                    onCancel={this.hideModal}
+                    destroyOnClose={true}
+                >
+                    {/*分类名称: <Input ref={c => this.categoryInput = c} placeholder="New Category Name"/>*/}
+                    <AddForm categories={categories} parentId={parentId}/>
+
+                </Modal>
+
+
+                <Modal
+                    title="修改分类"
+                    open={showModalStatus === 2}
+                    // onKeyPress={this.handleOnKeyDown}
+                    onOk={this.updateCategory}
+                    onCancel={this.hideModal}
+                    destroyOnClose={true}
+                >
+                    {/*形参 form 传递给子组件*/}
+                    <UpdateForm
+                        getUpdatedCategoryValue={this.getUpdatedCategoryValue}
+                        categoryName={this.name}
+                    />
+                </Modal>
             </Card>
         )
     }
