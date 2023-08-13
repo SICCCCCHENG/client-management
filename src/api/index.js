@@ -19,6 +19,12 @@ export const reqAddCategory = (parentId, categoryName) => ajax(baseUrl + '/manag
 export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(baseUrl + '/manage/category/update', {categoryId, categoryName}, 'POST')
 
 
+// 请求获取商品分页列表   (pageNum 表示第几页,不是总页数)
+export const reqProductList = (pageNum, pageSize) => ajax(baseUrl + '/manage/product/list', {pageNum, pageSize}, 'GET')
+export const reqProductSearchByName = (pageNum, pageSize, productName) => ajax(baseUrl + '/manage/product/search', {pageNum, pageSize, productName}, 'GET')
+export const reqProductSearchByDesc = (pageNum, pageSize, productDesc) => ajax(baseUrl + '/manage/product/search', {pageNum, pageSize, productDesc}, 'GET')
+
+
 export const reqWeather = (cityCode) => {
 
     const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=${cityCode}&key=d503450507970741ccfbd14e9624786e`

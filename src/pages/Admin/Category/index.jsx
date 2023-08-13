@@ -119,18 +119,36 @@ class Category extends Component {
     }
 
 
-    addCategory = () => {
-         /*const {value: categoryName} = this.categoryInput.input
-         console.log(categoryName)
-         reqAddCategory('0', categoryName)
+    getParentidAndCategoryname = (parentId, categoryName) => {
+        // console.log('parentId, categoryName', parentId, categoryName)
+        this.categoryToBeAdded = {parentId, categoryName}
+    }
 
-         this.setState({categories: []}, () => {
-             // 重新请求一级列表
-             this.getCategories()
-         })
 
-         this.hideModal()
-         message.success('添加成功')*/
+    addCategory = async () => {
+        this.hideModal()
+
+        const {parentId, categoryName} = this.categoryToBeAdded
+
+        const result = await reqAddCategory(parentId, categoryName)
+
+        if (result.status === 0){
+            if (parentId === '0') {
+                this.setState({categories: []}, () => {
+                    // 重新请求一级列表
+                    this.getCategories()
+                })
+            } else {
+                this.setState({subCategories: []}, () => {
+                    // 重新请求一级列表
+                    this.getCategories()
+                })
+            }
+            message.success('添加成功')
+        }else {
+            message.error('添加失败..')
+        }
+
     }
 
 
@@ -141,7 +159,7 @@ class Category extends Component {
         const categoryId = this.categoryObj._id
         const categoryName = this.newCategoryName
         const result = await reqUpdateCategory({categoryId, categoryName})
-        if (result.status === 0){  // 更新成功
+        if (result.status === 0) {  // 更新成功
             // 重新请求数据
             this.getCategories()
         }
@@ -260,7 +278,11 @@ class Category extends Component {
                     destroyOnClose={true}
                 >
                     {/*分类名称: <Input ref={c => this.categoryInput = c} placeholder="New Category Name"/>*/}
-                    <AddForm categories={categories} parentId={parentId}/>
+                    <AddForm
+                        categories={categories}
+                        parentId={parentId}
+                        getParentidAndCategoryname={this.getParentidAndCategoryname}
+                    />
 
                 </Modal>
 

@@ -7,19 +7,25 @@ import PropTypes from "prop-types";
 
 class AddForm extends Component {
 
+    state = {
+        parentId: '0',
+        categoryName:''
+    }
+
     static propTypes = {
         categories: PropTypes.array.isRequired,
-        parentId: PropTypes.string.isRequired
+        parentId: PropTypes.string.isRequired,
+        getParentidAndCategoryname: PropTypes.func.isRequired
     }
 
     collectCategoryName = () => {
         const {categories} = this.props
 
-        console.log(categories)
+        // console.log('我在这里....',categories)
 
         // 收集数组中的list名字到options数组中,再向下传递给Form表单
         return categories.map((item) => {
-            return {value: item.name, label: item.name}
+            return {value: item._id, label: item.name}
         })
     }
 
@@ -31,10 +37,34 @@ class AddForm extends Component {
         return targetObj.name
     }
 
+
+    collectSelectValue = (parentId) => {
+        // console.log('seclct这里测试.....',event)
+        this.setState({parentId}, ()=>{
+            // console.log('this.state', this.state)
+            const {parentId, categoryName} = this.state
+            this.props.getParentidAndCategoryname(parentId, categoryName)
+        })
+    }
+
+    collectInputValue = (event) => {
+        const {value: categoryName} = event.target
+        // console.log('input这里测试.....',event.target.value)
+        this.setState({categoryName}, ()=>{
+            const {parentId, categoryName} = this.state
+            this.props.getParentidAndCategoryname(parentId, categoryName)
+        })
+    }
+
+    componentDidMount() {
+        const {parentId} = this.props
+        this.setState({parentId})
+    }
+
     render() {
         const options = this.collectCategoryName()
         // label 待定
-        const itemObj = {value: '一级分类列表', label: '一级分类列表'}
+        const itemObj = {value: '0', label: '一级分类列表'}
         const newOptions = [itemObj, ...options]
 
         let parentName
@@ -52,7 +82,9 @@ class AddForm extends Component {
                 所属分类:
                 <Form.Item>
                     <Select
-                        showSearch
+                        onSelect={this.collectSelectValue}
+                        // showSearch
+                        // ref={c => this.selectOption = c }
                         placeholder="一级分类"
                         optionFilterProp="children"
                         defaultValue={parentName}
@@ -67,7 +99,7 @@ class AddForm extends Component {
                 <br/>
                 分类名称:
                 <Form.Item>
-                    <Input placeholder='请输入分类名称'/>
+                    <Input onChange={this.collectInputValue} placeholder='请输入分类名称'/>
                 </Form.Item>
                 <br/>
             </Form>
