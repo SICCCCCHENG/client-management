@@ -62,20 +62,22 @@ class LeftNav extends Component {
     }
 
     render() {
-        const {pathname} = this.props.location
+        let {pathname} = this.props.location
+        if (pathname === '/product/detail'){
+            pathname = '/product'
+        }
         return (
             <div className='left-nav'>
                 <Link to='/' className='left-nav-header'>
                     <img src={logo} alt=""/>
                     <h1>管理后台</h1>
                 </Link>
-
+                                                                    {/*这里是中括号是因为有可以多个选中,即为数组*/}
                 <Menu theme="dark" mode="vertical" style={{textAlign: 'left'}} selectedKeys={[pathname]}>
                     {
                         // console.log(this.generateNodes(menuList))
                         this.generateNodes(menuList)
                     }
-
                     {/*
                     <Menu.Item key="/home" icon={<HomeOutlined />}>
                         <Link to="/home">首页</Link>

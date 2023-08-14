@@ -21,9 +21,23 @@ export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(baseUrl + 
 
 // 请求获取商品分页列表   (pageNum 表示第几页,不是总页数)
 export const reqProductList = (pageNum, pageSize) => ajax(baseUrl + '/manage/product/list', {pageNum, pageSize}, 'GET')
+
+export const reqProductSearch = (pageNum, pageSize, keyword, searchType) => ajax(baseUrl + '/manage/product/search', {
+    pageNum,
+    pageSize,
+    [searchType]:keyword
+})
+/*
 export const reqProductSearchByName = (pageNum, pageSize, productName) => ajax(baseUrl + '/manage/product/search', {pageNum, pageSize, productName}, 'GET')
 export const reqProductSearchByDesc = (pageNum, pageSize, productDesc) => ajax(baseUrl + '/manage/product/search', {pageNum, pageSize, productDesc}, 'GET')
+*/
 
+
+
+export const reqCategoryName = (categoryId) => ajax(baseUrl + '/manage/category/info', {categoryId}, 'GET')
+
+// 对产品进行上架/下架处理(1代表在售,2代表下架)
+export const reqUpdateStatus = (productId, status) => ajax(baseUrl + '/manage/product/updateStatus', {productId, status}, 'POST')
 
 export const reqWeather = (cityCode) => {
 

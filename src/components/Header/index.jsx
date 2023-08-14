@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import { withRouter} from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import moment from "moment";
-import { message, Modal } from 'antd';
+import {message, Modal} from 'antd';
 import {ExclamationCircleFilled} from '@ant-design/icons'
 import memoryUtils from "../../utils/memoryUtils";
 import './index.css'
@@ -55,7 +55,7 @@ class Header extends Component {
     }*/
 
     findTitle = (menuList, pathname) => {
-        for (let item of menuList){
+        for (let item of menuList) {
             if (!item.children) {
                 if (pathname === item.key) {
                     return item.title
@@ -83,14 +83,13 @@ class Header extends Component {
     }
 
 
-
     logout = () => {
         // event.defaultPrevented(event)
-        const { confirm } = Modal;
+        const {confirm} = Modal;
         confirm({
             title: '您确定要退出登陆吗 ?',
-            icon: <ExclamationCircleFilled />,
-            onOk : () => {
+            icon: <ExclamationCircleFilled/>,
+            onOk: () => {
                 // console.log('OK');
                 storageUtils.removeUser()
                 memoryUtils.user = {}

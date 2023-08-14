@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Button, Card, Form, Input, message, Modal, Select, Table} from "antd";
 import LinkButton from "../../../../components/LinkButton";
 import {PlusOutlined} from "@ant-design/icons";
-import {reqProductList, reqProductSearchByDesc, reqProductSearchByName} from "../../../../api";
+import {reqProductList, reqProductSearch, reqUpdateStatus} from "../../../../api";
 import {PAGE_SIZE} from "../../../../utils/constants";
 
 class ProductHome extends Component {
@@ -10,55 +10,9 @@ class ProductHome extends Component {
     state = {
         products: [],
         total: 0,
-        loading: false
-        /*
-        [
-        {
-            'status': 1,
-            'imgs':[
-                'image-1554637573028.jpg',
-                'image-1554637573029.jpg'
-            ],
-            '_id': '64d5a36b49bf5c4bbc8ba078',
-            'name': '联想ThinkPad 翼480',
-            'desc': '年度重量级新品,X390全新登场 更加轻薄机身设计',
-            'price': '66000',
-            'pCategoryId': '64d5a36b49bf5c4bbc8ba078',
-            'categoryId': '64d5a36b49bf5c4bbc8ba078',
-            'detail': '<p><span style="\">',
-            '_v': 0
-        },
-        {
-            'status': 1,
-            'imgs':[
-                'image-1554637573028.jpg',
-                'image-1554637573029.jpg'
-            ],
-            '_id': '64d5a36b49bf5c4bbc8ba078',
-            'name': '联想ThinkPad 翼480',
-            'desc': '年度重量级新品,X390全新登场 更加轻薄机身设计',
-            'price': '66000',
-            'pCategoryId': '64d5a36b49bf5c4bbc8ba078',
-            'categoryId': '64d5a36b49bf5c4bbc8ba078',
-            'detail': '<p><span style="\">',
-            '_v': 0
-        },
-        {
-            'status': 1,
-            'imgs':[
-                'image-1554637573028.jpg',
-                'image-1554637573029.jpg'
-            ],
-            '_id': '64d5a36b49bf5c4bbc8ba078',
-            'name': '联想ThinkPad 翼480',
-            'desc': '年度重量级新品,X390全新登场 更加轻薄机身设计',
-            'price': '66000',
-            'pCategoryId': '64d5a36b49bf5c4bbc8ba078',
-            'categoryId': '64d5a36b49bf5c4bbc8ba078',
-            'detail': '<p><span style="\">',
-            '_v': 0
-        },
-    ]*/
+        loading: false,
+        searchType: 'productName',
+        keyword: '',
     }
 
 
@@ -84,17 +38,23 @@ class ProductHome extends Component {
             },
             {
                 title: '状态',
-                dataIndex: 'status',
+                // dataIndex: 'status',
                 width: '10%',
-                render: (status) =>
+                render: (productObj) => {
                     // this.showLinkButton(categoryObj)
-                    <div>
-                        <Button type='primary' onClick={this.showAddModal}>
-                            下架
-                        </Button>
-                        <br/>
-                        在售
-                    </div>
+                    const {_id, status} = productObj
+                    const newStatus = status === 1 ? 2 : 1
+                    return (
+                        <div>
+                            <Button type='primary' onClick={() => {
+                                this.updateStatus(_id, newStatus)
+                            }}>
+                                {status === 1 ? '下架' : '上架'}
+                            </Button>
+                            <br/>
+                            {status === 1 ? '在售' : '已下架'}
+                        </div>)
+                }
             },
             {
                 title: '操作',
@@ -107,9 +67,10 @@ class ProductHome extends Component {
                         }}>修改分类</LinkButton>
                         {categoryObj.parentId === '0' ? <LinkButton
                             onClick={() => this.showSubCategories(categoryObj)}>查看子分类</LinkButton> : null}*/}
-                        <LinkButton>详情</LinkButton>
+                        <LinkButton onClick={() => {
+                            this.props.history.push('/product/detail', productObj)
+                        }}>详情</LinkButton>
                         <LinkButton>修改</LinkButton>
-
                     </div>
             }
         ]
@@ -117,15 +78,24 @@ class ProductHome extends Component {
 
 
     getProducts = async (pageNum) => {
+        this.currentPage = pageNum
         this.setState({
             loading: true
         })
-        // pageNum 表示请求第几页数据
-        const result = await reqProductList(pageNum, PAGE_SIZE)
+        const {searchType, keyword} = this.state
+        // console.log('searchType, keyword: ', searchType, keyword)
+        let result
+        if (keyword) {
+            result = await reqProductSearch(pageNum, PAGE_SIZE, keyword, searchType)
+        } else {
+            // pageNum 表示请求第几页数据
+            result = await reqProductList(pageNum, PAGE_SIZE)
+        }
+
         this.setState({
             loading: false
         })
-        console.log('results', result)
+        // console.log('results', result)
         if (result.status === 0) {
             const {list: products, total} = result.data
             this.setState({products, total})
@@ -141,8 +111,15 @@ class ProductHome extends Component {
 
 
     onFinish = async (values) => {
-        console.log('接收到数据: ', values)
-        const {searchMethod, keyword} = values
+        this.currentPage = 1
+        const {searchType, keyword} = values
+        this.initColumns()
+        // console.log('接收到数据: ', values)
+        this.setState({searchType, keyword}, () => {
+            this.getProducts(1)
+        })
+
+        /*const {searchMethod, keyword} = values
         let result
         if (searchMethod === 'productDesc') {
             console.log('这里按照描述...')
@@ -159,6 +136,20 @@ class ProductHome extends Component {
             this.setState({products, total})
         } else {
             message.error('数据请求失败..')
+        }*/
+    }
+
+
+    updateStatus = async (productId, status) => {
+        this.setState({loading: true})
+        const result = await reqUpdateStatus(productId, status)
+        this.setState({loading: false})
+        if (result.status === 0) {
+            // console.log('this.currentPage', this.currentPage)
+            message.success("商品更新状态成功")
+            this.getProducts(this.currentPage)
+        } else {
+            message.error("更新状态失败,请稍后再试..")
         }
     }
 
@@ -182,7 +173,7 @@ class ProductHome extends Component {
                 style={{'width': '380px', display: 'flex'}}
                 onFinish={this.onFinish}
             >
-                <Form.Item name='searchMethod'>
+                <Form.Item name='searchType' initialValue='productName'>
                     <Select
                         style={{width: '120px'}}
                         // onSelect={this.collectSelectValue}
@@ -190,7 +181,9 @@ class ProductHome extends Component {
                         // ref={c => this.selectOption = c }
                         placeholder="按名称搜索"
                         // optionFilterProp="children"
-                        defaultValue="按名称搜索"
+                        // value='按名称搜索'
+                        // initialValue='productName'
+                        // defaultValue="productName"
                         // onChange={onChange}
                         // onSearch={onSearch}
                         filterOption={(input, option) =>
@@ -225,7 +218,7 @@ class ProductHome extends Component {
 
 
         const extra =
-            <Button type='primary' onClick={this.showAddModal}>
+            <Button type='primary' onClick={() => this.props.history.push('/product/addupdate')}>
                 <PlusOutlined/> 添加商品
             </Button>
 
@@ -237,12 +230,17 @@ class ProductHome extends Component {
             <div>
                 <Card title={title} extra={extra}>
                     <Table
+                        change="handleTableChange"
                         pagination={{
                             pageSize: PAGE_SIZE,
                             total,
                             showQuickJumper: true,
-                            // onChange: (page)=>{this.getProducts(page)}
-                            onChange: this.getProducts  // 等效上方
+                            onChange: (page) => {
+                                this.getProducts(page);
+                                this.currentPage = page
+                            },
+                            // onChange: this.getProducts,  // 等效上方
+                            current: this.currentPage
                         }}
                         // onChange={this.pageChange}
                         rowKey='_id'
