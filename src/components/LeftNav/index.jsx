@@ -63,7 +63,7 @@ class LeftNav extends Component {
 
     render() {
         let {pathname} = this.props.location
-        if (pathname === '/product/detail'){
+        if (pathname.startsWith('/product')){
             pathname = '/product'
         }
         return (

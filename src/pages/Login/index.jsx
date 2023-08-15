@@ -142,7 +142,6 @@ class Login extends Component {
                                 />
                             </Form.Item>
 
-
                             {/*<Form.Item>
                                 <Form.Item name="remember" valuePropName="checked" noStyle>
                                     <Checkbox>Remember me</Checkbox>
@@ -152,7 +151,6 @@ class Login extends Component {
                                     Forgot password
                                 </a>
                             </Form.Item>*/}
-
 
                             <Form.Item>
                                 <Button type="primary" htmlType="submit" className="login-form-button">

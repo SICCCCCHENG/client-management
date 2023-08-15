@@ -59,19 +59,28 @@ class ProductHome extends Component {
             {
                 title: '操作',
                 width: '10%',
-                render: (productObj) =>
+                render: (productObj) =>{
                     // this.showLinkButton(categoryObj)
-                    <div>
-                        {/*<LinkButton onClick={() => {
+
+                    // 将当前对象与当前页面一起传过去
+                    const  productObj_curPage = [productObj, this.currentPage]
+
+                    return (
+                        <div>
+                            {/*<LinkButton onClick={() => {
                             this.showUpdateModal(categoryObj)
                         }}>修改分类</LinkButton>
                         {categoryObj.parentId === '0' ? <LinkButton
                             onClick={() => this.showSubCategories(categoryObj)}>查看子分类</LinkButton> : null}*/}
-                        <LinkButton onClick={() => {
-                            this.props.history.push('/product/detail', productObj)
-                        }}>详情</LinkButton>
-                        <LinkButton>修改</LinkButton>
-                    </div>
+                            <LinkButton onClick={() => {
+                                this.props.history.push('/product/detail', productObj_curPage)
+                            }}>详情</LinkButton>
+                            <LinkButton onClick={()=>{
+                                this.props.history.push('/product/addupdate', productObj_curPage)
+                            }}>修改</LinkButton>
+                        </div>
+                    )
+                }
             }
         ]
     }
@@ -157,12 +166,16 @@ class ProductHome extends Component {
     componentWillMount() {
         this.searchOptions = [{value: 'productName', label: '按名称搜索'}, {value: 'productDesc', label: '按描述搜索'}]
         this.initColumns()
-
     }
 
     // 为第一次render()准备数据
     componentDidMount() {
-        this.getProducts(1)
+        this.currentPage = this.props.location.state
+        if (this.currentPage){
+            this.getProducts(this.currentPage)
+        }else{
+            this.getProducts(1)
+        }
     }
 
 
@@ -218,7 +231,7 @@ class ProductHome extends Component {
 
 
         const extra =
-            <Button type='primary' onClick={() => this.props.history.push('/product/addupdate')}>
+            <Button type='primary' onClick={() => this.props.history.push('/product/addupdate', this.currentPage)}>
                 <PlusOutlined/> 添加商品
             </Button>
 

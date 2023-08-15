@@ -33,10 +33,12 @@ class Detail extends Component {
         // this.setState({categoryName})
     */
 
-    async componentDidMount() {
-        const {categoryId, pCategoryId} = this.props.location.state
+
+    get_pName_cateName = async () => {
+        // 从ProductHome页面传过来
+        const {categoryId, pCategoryId} = this.props.location.state[0]
         // console.log('categoryId, pCateGoryId', categoryId, pCategoryId)
-        if (!categoryId) {
+        if (categoryId === "0") {
             const pResult = await reqCategoryName(pCategoryId)
             const pCategoryName = pResult.data.name
             this.setState({pCategoryName})
@@ -58,18 +60,25 @@ class Detail extends Component {
         }
     }
 
+    async componentDidMount() {
+        // 初始化 parentName 与 categoryName
+        await this.get_pName_cateName()
+    }
+
     render() {
+        const {name, desc, price} = this.props.location.state[0]
+
+        const curPage = this.props.location.state[1]
 
         const title =
             <div>
                 <ArrowLeftOutlined onClick={() => {
-                    this.props.history.goBack()
+                    // this.props.history.goBack()
+                    this.props.history.push('/product', curPage)
                 }} style={{fontSize: "18px", color: "green", marginRight: '10px'}}/>
                 <span>商品详情</span>
             </div>
 
-
-        const {name, desc, price} = this.props.location.state
 
         const {pCategoryName, categoryName} = this.state
 
