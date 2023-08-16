@@ -63,7 +63,7 @@ class ProductHome extends Component {
                     // this.showLinkButton(categoryObj)
 
                     // 将当前对象与当前页面一起传过去
-                    const  productObj_curPage = [productObj, this.currentPage]
+                    const  productObjAndCurPage = [productObj, this.currentPage]
 
                     return (
                         <div>
@@ -73,10 +73,10 @@ class ProductHome extends Component {
                         {categoryObj.parentId === '0' ? <LinkButton
                             onClick={() => this.showSubCategories(categoryObj)}>查看子分类</LinkButton> : null}*/}
                             <LinkButton onClick={() => {
-                                this.props.history.push('/product/detail', productObj_curPage)
+                                this.props.history.push('/product/detail', productObjAndCurPage)
                             }}>详情</LinkButton>
                             <LinkButton onClick={()=>{
-                                this.props.history.push('/product/addupdate', productObj_curPage)
+                                this.props.history.push('/product/addupdate', productObjAndCurPage)
                             }}>修改</LinkButton>
                         </div>
                     )
@@ -170,6 +170,7 @@ class ProductHome extends Component {
 
     // 为第一次render()准备数据
     componentDidMount() {
+        console.log('this.props: ',this.props)
         this.currentPage = this.props.location.state
         if (this.currentPage){
             this.getProducts(this.currentPage)

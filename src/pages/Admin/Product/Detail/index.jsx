@@ -4,6 +4,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons'
 import './index.css'
 import img from "../../../../assets/images/bob.jpeg"
 import {reqCategories, reqCategoryName} from "../../../../api";
+import {IMG_UPLOAD_BASE_URL} from "../../../../utils/constants";
 
 class Detail extends Component {
     state = {
@@ -35,6 +36,8 @@ class Detail extends Component {
 
 
     get_pName_cateName = async () => {
+        console.log('this.props.location.state[0]: ', this.props.location.state[0])
+
         // 从ProductHome页面传过来
         const {categoryId, pCategoryId} = this.props.location.state[0]
         // console.log('categoryId, pCateGoryId', categoryId, pCategoryId)
@@ -66,15 +69,21 @@ class Detail extends Component {
     }
 
     render() {
-        const {name, desc, price} = this.props.location.state[0]
+        const [productObj, currentPage] = this.props.location.state
 
-        const curPage = this.props.location.state[1]
+        const {name, desc, price, detail, imgs} = productObj
+
+
+
+        // const {name, desc, price} = this.props.location.state[0]
+
+        // const curPage = this.props.location.state[1]
 
         const title =
             <div>
                 <ArrowLeftOutlined onClick={() => {
                     // this.props.history.goBack()
-                    this.props.history.push('/product', curPage)
+                    this.props.history.push('/product', currentPage)
                 }} style={{fontSize: "18px", color: "green", marginRight: '10px'}}/>
                 <span>商品详情</span>
             </div>
@@ -110,7 +119,7 @@ class Detail extends Component {
                     <List.Item>
                         <div>
                             <span className='Detail-LeftTitle'>商品价格:</span>
-                            <span>{price}元</span>
+                            <span>{price} 元</span>
                         </div>
 
                     </List.Item>
@@ -124,16 +133,20 @@ class Detail extends Component {
                     <List.Item>
                         <div>
                             <span className='Detail-LeftTitle'>商品图片:</span>
-                            <img className='img' src={img} alt=""/>
-                            <img className='img' src={img} alt=""/>
+                            {
+                                imgs.map((img, index) => <img key={index} style={{maxHeight: 130}} src={IMG_UPLOAD_BASE_URL+img} alt=""/>)
+                            }
+                            {/*<img className='img' src={img} alt=""/>*/}
+                            {/*<img className='img' src={img} alt=""/>*/}
                         </div>
 
                     </List.Item>
                     <List.Item>
                         <div>
-                            <span className='Detail-LeftTitle'>商品详情:</span>
+                            <div className='Detail-LeftTitle'>商品详情:</div><br/>
                             <span
-                                dangerouslySetInnerHTML={{__html: '<h1 style="color:red">{desc}</h1>'}}></span>
+                                // dangerouslySetInnerHTML={{__html: '<h1 style="color:red">{desc}</h1>'}}></span>
+                                dangerouslySetInnerHTML={{__html: detail}}></span>
                         </div>
                     </List.Item>
                 </List>

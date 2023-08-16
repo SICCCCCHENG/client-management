@@ -39,6 +39,32 @@ export const reqCategoryName = (categoryId) => ajax(baseUrl + '/manage/category/
 // 对产品进行上架/下架处理(1代表在售,2代表下架)
 export const reqUpdateStatus = (productId, status) => ajax(baseUrl + '/manage/product/updateStatus', {productId, status}, 'POST')
 
+export const reqRemoveImg = (name) => ajax(baseUrl + '/manage/img/delete', {name}, 'POST')
+
+// 添加商品
+export const reqAddProduct = (pCategoryId, categoryId, name, desc, price, detail, imgs) => ajax(baseUrl + '/manage/product/add', {
+    pCategoryId,
+    categoryId,
+    name,
+    desc,
+    price,
+    detail,
+    imgs
+}, "POST")
+
+// 更新商品
+export const reqUpdateProduct = (_id, pCategoryId, categoryId, name, desc, price, detail, imgs) => ajax(baseUrl + '/manage/product/update', {
+    _id,
+    pCategoryId,
+    categoryId,
+    name,
+    desc,
+    price,
+    detail,
+    imgs
+}, "POST")
+
+
 export const reqWeather = (cityCode) => {
 
     const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=${cityCode}&key=d503450507970741ccfbd14e9624786e`
