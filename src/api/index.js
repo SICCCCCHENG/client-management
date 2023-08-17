@@ -14,9 +14,15 @@ export const reqAddUser = (dataObj) => ajax(baseUrl + '/manage/user/add', dataOb
 // 获取一级/二级分类列表
 export const reqCategories = (parentId) => ajax(baseUrl + '/manage/category/list', {parentId}, 'GET')
 // 添加分类
-export const reqAddCategory = (parentId, categoryName) => ajax(baseUrl + '/manage/category/add', {parentId, categoryName}, 'POST')
+export const reqAddCategory = (parentId, categoryName) => ajax(baseUrl + '/manage/category/add', {
+    parentId,
+    categoryName
+}, 'POST')
 // 修改分类
-export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(baseUrl + '/manage/category/update', {categoryId, categoryName}, 'POST')
+export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(baseUrl + '/manage/category/update', {
+    categoryId,
+    categoryName
+}, 'POST')
 
 
 // 请求获取商品分页列表   (pageNum 表示第几页,不是总页数)
@@ -25,7 +31,7 @@ export const reqProductList = (pageNum, pageSize) => ajax(baseUrl + '/manage/pro
 export const reqProductSearch = (pageNum, pageSize, keyword, searchType) => ajax(baseUrl + '/manage/product/search', {
     pageNum,
     pageSize,
-    [searchType]:keyword
+    [searchType]: keyword
 })
 /*
 export const reqProductSearchByName = (pageNum, pageSize, productName) => ajax(baseUrl + '/manage/product/search', {pageNum, pageSize, productName}, 'GET')
@@ -33,11 +39,13 @@ export const reqProductSearchByDesc = (pageNum, pageSize, productDesc) => ajax(b
 */
 
 
-
 export const reqCategoryName = (categoryId) => ajax(baseUrl + '/manage/category/info', {categoryId}, 'GET')
 
 // 对产品进行上架/下架处理(1代表在售,2代表下架)
-export const reqUpdateStatus = (productId, status) => ajax(baseUrl + '/manage/product/updateStatus', {productId, status}, 'POST')
+export const reqUpdateStatus = (productId, status) => ajax(baseUrl + '/manage/product/updateStatus', {
+    productId,
+    status
+}, 'POST')
 
 export const reqRemoveImg = (name) => ajax(baseUrl + '/manage/img/delete', {name}, 'POST')
 
@@ -65,6 +73,18 @@ export const reqUpdateProduct = (_id, pCategoryId, categoryId, name, desc, price
 }, "POST")
 
 
+// 请求当前所有角色
+export const reqRoleList = () => ajax(baseUrl + '/manage/role/list')
+
+
+// 请求添加角色
+export const reqAddRole = (roleName) => ajax(baseUrl + '/manage/role/add', {roleName}, 'POST')
+
+
+// 请求更新角色权限
+export const reqUpdateRoleAuth = (_id, menus, auth_time, auth_name) => ajax(baseUrl + '/manage/role/update', {_id, menus, auth_time, auth_name}, 'POST')
+
+
 export const reqWeather = (cityCode) => {
 
     const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=${cityCode}&key=d503450507970741ccfbd14e9624786e`
@@ -75,7 +95,7 @@ export const reqWeather = (cityCode) => {
                 const {weather, temperature} = data.lives[0]
                 resolve({weather, temperature})
             } else {
-                message.error('获取数据出错!'+err.toString())
+                message.error('获取数据出错!' + err.toString())
             }
         })
     })

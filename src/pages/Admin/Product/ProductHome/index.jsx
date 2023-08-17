@@ -170,7 +170,7 @@ class ProductHome extends Component {
 
     // 为第一次render()准备数据
     componentDidMount() {
-        console.log('this.props: ',this.props)
+        // console.log('this.props: ',this.props)
         this.currentPage = this.props.location.state
         if (this.currentPage){
             this.getProducts(this.currentPage)
