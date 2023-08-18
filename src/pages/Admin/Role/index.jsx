@@ -6,6 +6,7 @@ import AddRoleAuthForm from './Add-Role-Auth-Form'
 import {reqAddRole, reqRoleList, reqUpdateRoleAuth} from "../../../api";
 import {PAGE_SIZE} from "../../../utils/constants";
 import memoryUtils from "../../../utils/memoryUtils";
+import storageUtils from "../../../utils/storageUtils";
 
 class Role extends Component {
 
@@ -89,11 +90,21 @@ class Role extends Component {
         // console.log('memoryUtils: ', memoryUtils)
         const result = await reqUpdateRoleAuth (_id, selectedKeys, auth_time, auth_name)
         if (result.status === 0){
-            message.success("更新用户权限成功")
-            await this.getRoleList()
-            this.setState({
-                role: {}
-            })
+
+            // 如果设置自己的对应的权限,则退出重新登陆
+            if(memoryUtils.user.role_id === _id){
+                message.warning("自身角色权限设置成功,请重新登陆")
+                memoryUtils.user = {}
+                storageUtils.removeUser()
+                this.props.history.replace('/login')
+            }else {
+                message.success("更新用户权限成功")
+                await this.getRoleList()
+                this.setState({
+                    role: {}
+                })
+            }
+
         }else {
             message.error("更新用户权限失败,请稍后再试..")
         }
@@ -154,7 +165,7 @@ class Role extends Component {
         const title = (
             <span>
                 <Button type='primary' onClick={this.showAddRoleModal} style={{marginRight: '10px'}}>创建角色</Button>
-                <Button type='primary' onClick={this.showAddRoleAuthModal} disabled={!role._id}>创建角色权限</Button>
+                <Button type='primary' onClick={this.showAddRoleAuthModal} disabled={!role._id}>设置角色权限</Button>
             </span>
         )
 

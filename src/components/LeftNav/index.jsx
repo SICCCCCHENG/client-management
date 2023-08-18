@@ -4,6 +4,7 @@ import {Link, withRouter} from 'react-router-dom'
 import logo from '../../assets/images/bob.jpeg'
 import './index.css'
 import menuList from '../../config/menuConfig'
+import memoryUtils from "../../utils/memoryUtils";
 /*
 import {
     ToolOutlined,
@@ -42,37 +43,95 @@ class LeftNav extends Component {
 
     // pre相当于收集数据
     generateNodes(menuList) {
-        return menuList.reduce((pre, item) => {
-            if (!item.children) {
-                pre.push((
-                    <Menu.Item key={item.key} icon={item.icon}>
-                        <Link to={item.key}>{item.title}</Link>
-                    </Menu.Item>
-                ))
-            } else {
-                pre.push((
-                    /*默认展开选项卡 defaultOpenKeys={['/charts']}*/
-                    <Menu.SubMenu key={item.key} icon={item.icon} title={item.title}>
+
+        if (memoryUtils.user.username === 'admin') {
+            return menuList.reduce((pre, item) => {
+                if (!item.children) {
+                    pre.push((
+                        <Menu.Item key={item.key} icon={item.icon}>
+                            <Link to={item.key}>{item.title}</Link>
+                        </Menu.Item>
+                    ))
+                } else {
+                    pre.push((
+                        /*默认展开选项卡 defaultOpenKeys={['/charts']}*/
+                        <Menu.SubMenu key={item.key} icon={item.icon} title={item.title}>
+                            {this.generateNodes(item.children)}
+                        </Menu.SubMenu>
+                    ))
+                }
+                return pre
+            }, [])
+        } else {
+            return menuList.reduce((pre, item) => {
+                // debugger
+                if (!item.children) {
+                    if (this.findNode(item.key)) {
+                        pre.push((
+                            <Menu.Item key={item.key} icon={item.icon}>
+                                <Link to={item.key}>{item.title}</Link>
+                            </Menu.Item>
+                        ))
+                    }
+                } else {
+                    if (this.hasSubcategory(item.key)){
+                        pre.push((
+                            /*默认展开选项卡 defaultOpenKeys={['/charts']}*/
+                            <Menu.SubMenu key={item.key} icon={item.icon} title={item.title}>
+                                {this.generateNodes(item.children)}
+                            </Menu.SubMenu>
+                        ))
+                    }else {
                         {this.generateNodes(item.children)}
-                    </Menu.SubMenu>
-                ))
+                    }
+                }
+                return pre
+            }, [])
+        }
+    }
+
+    // 判断一级标题下是否含有二级子标题
+    hasSubcategory = (key) => {
+        // 先找出一级标题
+        const targetMenu = menuList.find(item => {
+            return item.key === key
+        })
+
+        for (let i = 0; i < targetMenu.children.length; i++){
+            for (let j = 0; j < this.userAuth.length; j++){
+                if (targetMenu.children[i].key === this.userAuth[j])
+                    return true
             }
-            return pre
-        }, [])
+        }
+        return false
+    }
+
+    findNode = (key) => {
+        const index = this.userAuth.indexOf(key)
+        console.log('key: =====>', key)
+        console.log('index: =====>', index)
+        return index >= 0
     }
 
     render() {
+
+        this.userAuth = memoryUtils.user.role.menus
+        console.log('this.userAuth: ', this.userAuth)
+
+
         let {pathname} = this.props.location
-        if (pathname.startsWith('/product')){
+        if (pathname.startsWith('/product')) {
             pathname = '/product'
         }
+
+
         return (
             <div className='left-nav'>
                 <Link to='/' className='left-nav-header'>
                     <img src={logo} alt=""/>
                     <h1>管理后台</h1>
                 </Link>
-                                                                    {/*这里是中括号是因为有可以多个选中,即为数组*/}
+                {/*这里是中括号是因为有可以多个选中,即为数组*/}
                 <Menu theme="dark" mode="vertical" style={{textAlign: 'left'}} selectedKeys={[pathname]}>
                     {
                         // console.log(this.generateNodes(menuList))

@@ -6,10 +6,22 @@ import {message} from "antd";
 
 const baseUrl = 'http://127.0.0.1:3000'
 
+
+// 请求登陆
 export const reqLogin = ({username, password}) => ajax(baseUrl + '/login', {username, password}, 'POST')
 
+
+// 添加用户
 export const reqAddUser = (dataObj) => ajax(baseUrl + '/manage/user/add', dataObj, 'POST')
 
+// 更新用户
+export const reqUpdateUser = (dataObj) => ajax(baseUrl + '/manage/user/update', dataObj, 'POST')
+
+// 获取所有用户列表
+export const reqUserList = () => ajax(baseUrl + '/manage/user/list')
+
+// 获取所有用户列表
+export const reqDeleteUser = (userId) => ajax(baseUrl + '/manage/user/delete', {userId}, 'POST')
 
 // 获取一级/二级分类列表
 export const reqCategories = (parentId) => ajax(baseUrl + '/manage/category/list', {parentId}, 'GET')
