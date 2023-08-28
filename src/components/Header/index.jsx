@@ -3,12 +3,15 @@ import {withRouter} from "react-router-dom";
 import moment from "moment";
 import {message, Modal} from 'antd';
 import {ExclamationCircleFilled} from '@ant-design/icons'
+import {connect} from "react-redux";
+
 import memoryUtils from "../../utils/memoryUtils";
 import './index.css'
 import {reqWeather} from '../../api/index'
 import menuList from "../../config/menuConfig";
 import storageUtils from "../../utils/storageUtils";
 import LinkButton from "../LinkButton";
+import {changeTitle} from "../../redux/actions/title";
 
 
 class Header extends Component {
@@ -20,41 +23,6 @@ class Header extends Component {
     }
 
     /*findTitle = (menuList, pathname) => {
-        return menuList.forEach(item => {
-            // debugger
-            if (!item.children) {
-                // debugger
-                if (pathname === item.key) {
-                    // debugger
-                    return item.title
-                }
-            } else {
-                return this.findTitle(item.children, pathname)
-            }
-        })
-    }*/
-
-    /*findTitle2 = (list, pathname) => {
-        let value;
-        for (let i = 0; i < list.length; i++){
-            // debugger
-            if (!list[i].children) {
-                // debugger
-                if (pathname === list[i].key) {
-                    // debugger
-                    return list[i].title
-                }
-            } else {
-                // debugger
-                value = this.findTitle(list[i].children, pathname)
-                if (value)
-                    return value
-            }
-        }
-        // return value
-    }*/
-
-    findTitle = (menuList, pathname) => {
         for (let item of menuList) {
             if (!item.children) {
                 if (pathname === item.key) {
@@ -66,7 +34,7 @@ class Header extends Component {
                     return this.title
             }
         }
-    }
+    }*/
 
 
     updateTime = () => {
@@ -93,6 +61,8 @@ class Header extends Component {
                 // console.log('OK');
                 storageUtils.removeUser()
                 memoryUtils.user = {}
+                this.props.changeTitle('首页')
+                // this.props.history.replace('/home')
                 this.props.history.replace('/login')
                 // return <Redirect to='/login'/>
                 message.success('退出成功')
@@ -116,8 +86,11 @@ class Header extends Component {
 
         const {currentTime, weather, temperature} = this.state
         const {username} = memoryUtils.user
-        const {pathname} = this.props.location
-        const title = this.findTitle(menuList, pathname)
+
+
+
+        // const {pathname} = this.props.location
+        // const title = this.findTitle(menuList, pathname)
 
 
         return (
@@ -130,7 +103,7 @@ class Header extends Component {
                     <LinkButton onClick={this.logout}>退出</LinkButton>
                 </div>
                 <div className='header-bottom'>
-                    <div className='header-bottom-title'>{title}
+                    <div className='header-bottom-title'>{this.props.title}
                         <div className='pointer'></div>
                     </div>
                     <div className='header-bottom-info'>
@@ -145,4 +118,8 @@ class Header extends Component {
     }
 }
 
-export default withRouter(Header);
+// 只需要从redux中读取title
+export default connect(state => ({
+    title: state.title
+}), {changeTitle})
+(withRouter(Header))

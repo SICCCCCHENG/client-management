@@ -1,28 +1,17 @@
 import React, {Component} from 'react';
 // import {Link, NavLink} from 'react-router-dom'
 import {Link, withRouter} from 'react-router-dom'
-import logo from '../../assets/images/bob.jpeg'
-import './index.css'
-import menuList from '../../config/menuConfig'
-import memoryUtils from "../../utils/memoryUtils";
-/*
-import {
-    ToolOutlined,
-    UnorderedListOutlined,
-    HomeOutlined,
-    AppstoreOutlined,
-    UserOutlined,
-    SafetyCertificateOutlined,
-    AreaChartOutlined,
-    PieChartOutlined,
-    LineChartOutlined,
-    BarChartOutlined
-} from '@ant-design/icons';
-*/
-
+import {connect} from "react-redux";
 import {Menu} from 'antd';
 
+import logo from '../../assets/images/bob.jpeg'
+import menuList from '../../config/menuConfig'
+import memoryUtils from "../../utils/memoryUtils";
+import {changeTitle} from "../../redux/actions/title";
+import './index.css'
+
 class LeftNav extends Component {
+
     generateNodes_map(menuList) {
         return menuList.map((item) => {
             if (!item.children) {
@@ -41,15 +30,24 @@ class LeftNav extends Component {
         })
     }
 
+
+    // 保存当前标题到redux中
+    saveTitle = (title) => {
+        console.log('title: ',title)
+        this.props.changeTitle(title)
+        // console.log('this.props: ',this.props)
+    }
+
     // pre相当于收集数据
     generateNodes(menuList) {
 
         if (memoryUtils.user.username === 'admin') {
             return menuList.reduce((pre, item) => {
                 if (!item.children) {
+                    this.setTitle(item)
                     pre.push((
                         <Menu.Item key={item.key} icon={item.icon}>
-                            <Link to={item.key}>{item.title}</Link>
+                            <Link to={item.key} onClick={()=>this.saveTitle(item.title)}>{item.title}</Link>
                         </Menu.Item>
                     ))
                 } else {
@@ -67,6 +65,7 @@ class LeftNav extends Component {
                 // debugger
                 if (!item.children) {
                     if (this.findNode(item.key)) {
+                        this.setTitle(item)
                         pre.push((
                             <Menu.Item key={item.key} icon={item.icon}>
                                 <Link to={item.key}>{item.title}</Link>
@@ -113,16 +112,45 @@ class LeftNav extends Component {
         return index >= 0
     }
 
+    setTitle = (item) => {
+        let {pathname} = this.props.location
+        if (pathname.startsWith(item.key)){
+            this.props.changeTitle(item.title)
+        }
+    }
+
+    findTitle = (menuList, pathname) => {
+        for (let ele of menuList){
+            if (!ele.children) {
+                if (ele.key === pathname)
+                    return ele.title
+            }else {
+                let res = this.findTitle(ele.children, pathname)
+                if (res) return res
+            }
+        }
+    }
+
     render() {
 
         this.userAuth = memoryUtils.user.role.menus
-        console.log('this.userAuth: ', this.userAuth)
+        // console.log('this.userAuth: ', this.userAuth)
 
 
         let {pathname} = this.props.location
+
+        /*console.log('pathname: ',pathname)
+        const titleObj = this.findTitle(menuList, pathname) || {}
+        this.props.changeTitle(titleObj)
+        console.log('titleObj: ',titleObj)*/
+
         if (pathname.startsWith('/product')) {
             pathname = '/product'
         }
+
+
+
+        // console.log('title: =========',title)
 
 
         return (
@@ -137,44 +165,14 @@ class LeftNav extends Component {
                         // console.log(this.generateNodes(menuList))
                         this.generateNodes(menuList)
                     }
-                    {/*
-                    <Menu.Item key="/home" icon={<HomeOutlined />}>
-                        <Link to="/home">首页</Link>
-                    </Menu.Item>
-
-                    <Menu.SubMenu icon={<AppstoreOutlined/>} title='商品'>
-                        <Menu.Item key="/category" icon={<UnorderedListOutlined />}>
-                            <NavLink to="/category">品类管理</NavLink>
-                        </Menu.Item>
-                        <Menu.Item key="/product" icon={<ToolOutlined />}>
-                            <NavLink to="/product">商品管理</NavLink>
-                        </Menu.Item>
-                    </Menu.SubMenu>
-
-                    <Menu.Item key="/user" icon={<UserOutlined />}>
-                        <NavLink to="/user">用户管理</NavLink>
-                    </Menu.Item>
-
-                    <Menu.Item key="/role" icon={<SafetyCertificateOutlined/>}>
-                        <NavLink to="/role">角色管理</NavLink>
-                    </Menu.Item>
-
-                    <Menu.SubMenu icon={<AreaChartOutlined/>} title='图表界面'>
-                        <Menu.Item key="/charts/bar" icon={<BarChartOutlined />}>
-                            <NavLink to="/charts/bar">条形图</NavLink>
-                        </Menu.Item>
-                        <Menu.Item key="/charts/pie" icon={<PieChartOutlined />}>
-                            <NavLink to="/charts/pie">比例图</NavLink>
-                        </Menu.Item>
-                        <Menu.Item key="/charts/line" icon={<LineChartOutlined />}>
-                            <NavLink to="/charts/line">折线图</NavLink>
-                        </Menu.Item>
-                    </Menu.SubMenu>
-                    */}
                 </Menu>
             </div>
         );
     }
 }
 
-export default withRouter(LeftNav);
+
+export default connect(
+    state => ({}),
+    {changeTitle}
+)(withRouter(LeftNav))
